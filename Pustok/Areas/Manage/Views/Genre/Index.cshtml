@@ -1,0 +1,103 @@
+﻿@model List<Pustok.Models.Genre>
+
+<div class="container">
+    <div class="row mb-3">
+        <div class="col">
+            <h2>Genre List</h2>
+        </div>
+        <div class="col text-end">
+            <a asp-area="Manage" asp-controller="Genre" asp-action="Create" class="btn btn-success">Create New Genre</a>
+        </div>
+    </div>
+    <div class="row">
+        <table class="table">
+            <thead>
+                <tr>
+                    <th scope="col">Name</th>
+                    <th scope="col">Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var item in Model)
+                {
+                    <tr>
+                        <td>@item.Name</td>
+                        <td>
+                            <a asp-area="Manage" asp-controller="Genre" asp-action="Edit" asp-route-id="@item.Id" class="btn btn-sm btn-info">Edit</a>
+                            <a asp-area="Manage" asp-controller="Genre" asp-action="Delete" asp-route-id="@item.Id" class="btn btn-sm btn-danger delete">Delete</a>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<!-- Detail Modal -->
+<div class="modal fade" id="detailModal" tabindex="-1" role="dialog" aria-labelledby="detailModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg" role="document">
+        <div class="modal-content">
+            <!-- Modal content will be loaded here -->
+        </div>
+    </div>
+</div>
+
+@section Scripts
+{
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script>
+        $(document).ready(function(){
+            // Delete functionality
+            $(".delete").click(function(e){
+                e.preventDefault();
+                let url = $(this).attr("href");
+                Swal.fire({
+                    title: "Are you sure?",
+                    showCancelButton: true,
+                    confirmButtonText: "Delete"
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        fetch(url).then(res=>{
+                            if(res.ok) {
+                                Swal.fire({
+                                    title: "Deleted!",
+                                    text: "Your file has been deleted.",
+                                    icon: "success"
+                                });
+                                window.location.reload();
+                            }
+                            else{
+                                Swal.fire({
+                                    title: "Error!",
+                                    text: "Something went wrong.",
+                                    icon: "error"
+                                });
+                            }
+                        });
+                    } 
+                }); 
+            });
+
+            // Detail Modal functionality
+            $(".detail-btn").click(function() {
+                let id = $(this).data('id');
+                let url = `/manage/genre/detail/${id}`;
+                
+                fetch(url)
+                    .then(response => response.text())
+                    .then(html => {
+                        $("#detailModal .modal-content").html(html);
+                        $("#detailModal").modal('show');
+                    })
+                    .catch(error => {
+                        console.error('Error:', error);
+                        Swal.fire({
+                            title: "Error!",
+                            text: "Failed to load genre details.",
+                            icon: "error"
+                        });
+                    });
+            });
+        });
+    </script>
+}

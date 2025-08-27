@@ -1,0 +1,51 @@
+@model List<Book>
+
+@foreach (var item in Model)
+{
+    <div class="single-slide">
+        <div class="product-card">
+            <div class="product-header">
+                <a href="#" class="author">
+                    @item.Author.Name
+                </a>
+                <h3>
+                    <a href="@Url.Action("Detail", "Book", new { id = item.Id })">@item.Title</a>
+                </h3>
+            </div>
+            <div class="product-card--body">
+                <div class="card-image">
+                    <img src="@item.MainImage" alt="@item.Title">
+                    <div class="hover-contents">
+                        <a href="@Url.Action("Detail", "Book", new { id = item.Id })" class="hover-image">
+                            <img src="@item.HoverImage" alt="@item.Title">
+                        </a>
+                        <div class="hover-btns">
+                            <a href="#" class="single-btn" title="Add to Cart">
+                                <i class="fas fa-shopping-basket"></i>
+                            </a>
+                            <a href="#" class="single-btn" title="Add to Wishlist">
+                                <i class="fas fa-heart"></i>
+                            </a>
+                            <a href="#" class="single-btn" title="Compare">
+                                <i class="fas fa-random"></i>
+                            </a>
+                            <a asp-action="BookModal" asp-controller="Book" asp-route-id="@item.Id" data-bs-toggle="modal" data-bs-target="#quickModal" class="single-btn BookModal" title="Quick View">
+                                <i class="fas fa-eye"></i>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+                <div class="price-block">
+                    <span class="price">£@(item.Price-((item.Price*item.DiscountPrice)/100))</span>
+                    @if (item.DiscountPrice > 0)
+                    {
+                        <del class="price-old">£@item.Price</del>
+                        <span class="price-discount">@item.DiscountPrice%</span>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+}
+
+
