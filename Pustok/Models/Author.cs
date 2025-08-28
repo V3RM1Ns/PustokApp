@@ -2,7 +2,7 @@ using System.ComponentModel.DataAnnotations;
 
 namespace Pustok.Models;
 
-public class Author:BaseEntity
+public class Author:AuditEntity
 {
     [Required(ErrorMessage = "Yazar adı gereklidir")]
     [StringLength(100, ErrorMessage = "Yazar adı en fazla 100 karakter olabilir")]

@@ -1,0 +1,49 @@
+@model Pustok.Models.Author
+
+<div class="container-fluid">
+    <div class="row mb-4">
+        <div class="col">
+            <h2 class="text-primary"><i class="fas fa-edit"></i> Edit Author</h2>
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item"><a asp-area="Manage" asp-controller="Author" asp-action="Index">Authors</a></li>
+                    <li class="breadcrumb-item active">Edit</li>
+                </ol>
+            </nav>
+        </div>
+    </div>
+
+    <div class="row justify-content-center">
+        <div class="col-md-6">
+            <div class="card shadow">
+                <div class="card-header bg-warning text-dark">
+                    <h5 class="mb-0"><i class="fas fa-user"></i> Edit Author Information</h5>
+                </div>
+                <div class="card-body">
+                    <form asp-action="Edit" method="post">
+                        <input asp-for="Id" type="hidden" />
+                        
+                        <div class="form-group mb-3">
+                            <label asp-for="Name" class="form-label"><i class="fas fa-user"></i> Author Name</label>
+                            <input asp-for="Name" class="form-control" placeholder="Enter author name" />
+                            <span asp-validation-for="Name" class="text-danger"></span>
+                        </div>
+
+                        <div class="form-group">
+                            <button type="submit" class="btn btn-warning btn-lg me-2">
+                                <i class="fas fa-save"></i> Update Author
+                            </button>
+                            <a asp-area="Manage" asp-controller="Author" asp-action="Index" class="btn btn-secondary btn-lg">
+                                <i class="fas fa-arrow-left"></i> Back to List
+                            </a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}

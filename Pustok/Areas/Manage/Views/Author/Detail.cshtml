@@ -1,0 +1,89 @@
+@model Pustok.Models.Author
+
+<div class="modal-header">
+    <h4 class="modal-title"><i class="fas fa-user"></i> Author Details</h4>
+    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+</div>
+
+<div class="modal-body">
+    <div class="row">
+        <div class="col-md-6">
+            <table class="table table-borderless">
+                <tr>
+                    <td><strong><i class="fas fa-hashtag"></i> ID:</strong></td>
+                    <td><span class="badge bg-primary">@Model.Id</span></td>
+                </tr>
+                <tr>
+                    <td><strong><i class="fas fa-user"></i> Name:</strong></td>
+                    <td>@Model.Name</td>
+                </tr>
+                <tr>
+                    <td><strong><i class="fas fa-calendar"></i> Created:</strong></td>
+                    <td>@Model.CreatedAt.ToString("dd/MM/yyyy HH:mm")</td>
+                </tr>
+                @if (Model.UpdatedAt.HasValue)
+                {
+                    <tr>
+                        <td><strong><i class="fas fa-edit"></i> Updated:</strong></td>
+                        <td>@Model.UpdatedAt.Value.ToString("dd/MM/yyyy HH:mm")</td>
+                    </tr>
+                }
+                <tr>
+                    <td><strong><i class="fas fa-book"></i> Total Books:</strong></td>
+                    <td>
+                        @if (Model.Books?.Any() == true)
+                        {
+                            <span class="badge bg-info">@Model.Books.Count books</span>
+                        }
+                        else
+                        {
+                            <span class="text-muted">No books yet</span>
+                        }
+                    </td>
+                </tr>
+            </table>
+        </div>
+        
+        <div class="col-md-6">
+            @if (Model.Books?.Any() == true)
+            {
+                <h6><i class="fas fa-book"></i> Books by this Author</h6>
+                <div class="list-group">
+                    @foreach (var book in Model.Books.Take(5))
+                    {
+                        <div class="list-group-item list-group-item-action">
+                            <div class="d-flex w-100 justify-content-between">
+                                <h6 class="mb-1">@book.Title</h6>
+                                <small class="text-success">$@book.Price</small>
+                            </div>
+                            <p class="mb-1">@(book.Genre?.Name ?? "No Genre")</p>
+                            <small>
+                                @if (book.IsNew)
+                                {
+                                    <span class="badge bg-success me-1">New</span>
+                                }
+                                @if (book.IsFeatured)
+                                {
+                                    <span class="badge bg-warning">Featured</span>
+                                }
+                            </small>
+                        </div>
+                    }
+                    @if (Model.Books.Count > 5)
+                    {
+                        <small class="text-muted">... and @(Model.Books.Count - 5) more books</small>
+                    }
+                </div>
+            }
+        </div>
+    </div>
+</div>
+
+<div class="modal-footer">
+    <a asp-area="Manage" asp-controller="Author" asp-action="Edit" asp-route-id="@Model.Id" class="btn btn-warning">
+        <i class="fas fa-edit"></i> Edit
+    </a>
+    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+        <i class="fas fa-times"></i> Close
+    </button>
+</div>

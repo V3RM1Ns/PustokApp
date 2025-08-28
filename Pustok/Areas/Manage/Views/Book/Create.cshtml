@@ -1,0 +1,177 @@
+@model Pustok.Models.Book
+
+<div class="container-fluid">
+    <div class="row mb-4">
+        <div class="col">
+            <h2 class="text-primary"><i class="fas fa-plus"></i> Create New Book</h2>
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item"><a asp-area="Manage" asp-controller="Book" asp-action="Index">Books</a></li>
+                    <li class="breadcrumb-item active">Create</li>
+                </ol>
+            </nav>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-12">
+            <div class="card shadow">
+                <div class="card-header bg-primary text-white">
+                    <h5 class="mb-0"><i class="fas fa-book"></i> Book Information</h5>
+                </div>
+                <div class="card-body">
+                    <form asp-action="Create" method="post" enctype="multipart/form-data">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="form-group mb-3">
+                                    <label asp-for="Title" class="form-label"><i class="fas fa-book-open"></i> Title</label>
+                                    <input asp-for="Title" class="form-control" placeholder="Enter book title" />
+                                    <span asp-validation-for="Title" class="text-danger"></span>
+                                </div>
+
+                                <div class="form-group mb-3">
+                                    <label asp-for="AuthorId" class="form-label"><i class="fas fa-user"></i> Author</label>
+                                    <select asp-for="AuthorId" class="form-select" asp-items="ViewBag.Authors">
+                                        <option value="">Select Author</option>
+                                    </select>
+                                    <span asp-validation-for="AuthorId" class="text-danger"></span>
+                                </div>
+
+                                <div class="form-group mb-3">
+                                    <label asp-for="GenreId" class="form-label"><i class="fas fa-tag"></i> Genre</label>
+                                    <select asp-for="GenreId" class="form-select" asp-items="ViewBag.Genres">
+                                        <option value="">Select Genre</option>
+                                    </select>
+                                    <span asp-validation-for="GenreId" class="text-danger"></span>
+                                </div>
+
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <div class="form-group mb-3">
+                                            <label asp-for="Price" class="form-label"><i class="fas fa-dollar-sign"></i> Price</label>
+                                            <input asp-for="Price" class="form-control" type="number" step="0.01" placeholder="0.00" />
+                                            <span asp-validation-for="Price" class="text-danger"></span>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="form-group mb-3">
+                                            <label asp-for="DiscountPrice" class="form-label"><i class="fas fa-percent"></i> Discount %</label>
+                                            <input asp-for="DiscountPrice" class="form-control" type="number" min="0" max="100" placeholder="0" />
+                                            <span asp-validation-for="DiscountPrice" class="text-danger"></span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="col-md-6">
+                                <div class="form-group mb-3">
+                                    <label asp-for="Description" class="form-label"><i class="fas fa-align-left"></i> Description</label>
+                                    <textarea asp-for="Description" class="form-control" rows="4" placeholder="Enter book description"></textarea>
+                                    <span asp-validation-for="Description" class="text-danger"></span>
+                                </div>
+
+                                <div class="row">
+                                    <div class="col-md-4">
+                                        <div class="form-check mb-2">
+                                            <input asp-for="InStock" class="form-check-input" type="checkbox" />
+                                            <label asp-for="InStock" class="form-check-label">
+                                                <i class="fas fa-boxes"></i> In Stock
+                                            </label>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <div class="form-check mb-2">
+                                            <input asp-for="IsFeatured" class="form-check-input" type="checkbox" />
+                                            <label asp-for="IsFeatured" class="form-check-label">
+                                                <i class="fas fa-star"></i> Featured
+                                            </label>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <div class="form-check mb-2">
+                                            <input asp-for="IsNew" class="form-check-input" type="checkbox" />
+                                            <label asp-for="IsNew" class="form-check-label">
+                                                <i class="fas fa-certificate"></i> New
+                                            </label>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <hr />
+
+                        <!-- Image Upload Section -->
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="form-group mb-3">
+                                    <label class="form-label"><i class="fas fa-image"></i> Main Image</label>
+                                    <input type="file" name="MainImageFile" class="form-control" accept="image/*" />
+                                    <small class="form-text text-muted">Upload main book image</small>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-group mb-3">
+                                    <label class="form-label"><i class="fas fa-images"></i> Hover Image</label>
+                                    <input type="file" name="HoverImageFile" class="form-control" accept="image/*" />
+                                    <small class="form-text text-muted">Upload hover effect image</small>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="form-group mb-3">
+                            <label class="form-label"><i class="fas fa-photo-video"></i> Additional Images</label>
+                            <input type="file" name="ImageFiles" class="form-control" accept="image/*" multiple />
+                            <small class="form-text text-muted">Upload additional book images (multiple files allowed)</small>
+                        </div>
+
+                        <!-- Tags Section -->
+                        <div class="form-group mb-4">
+                            <label class="form-label"><i class="fas fa-tags"></i> Tags</label>
+                            <div class="row">
+                                @foreach (var tag in (List<Pustok.Models.Tag>)ViewBag.Tags)
+                                {
+                                    <div class="col-md-3 mb-2">
+                                        <div class="form-check">
+                                            <input class="form-check-input" type="checkbox" name="TagIds" value="@tag.Id" id="tag_@tag.Id">
+                                            <label class="form-check-label" for="tag_@tag.Id">
+                                                @tag.Name
+                                            </label>
+                                        </div>
+                                    </div>
+                                }
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <button type="submit" class="btn btn-success btn-lg me-2">
+                                <i class="fas fa-save"></i> Save Book
+                            </button>
+                            <a asp-area="Manage" asp-controller="Book" asp-action="Index" class="btn btn-secondary btn-lg">
+                                <i class="fas fa-arrow-left"></i> Back to List
+                            </a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+    
+    <script>
+        // Image preview functionality
+        $('input[type="file"]').change(function() {
+            const file = this.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    // You can add image preview functionality here
+                };
+                reader.readAsDataURL(file);
+            }
+        });
+    </script>
+}

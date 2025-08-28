@@ -3,51 +3,40 @@ using Pustok.Data;
 using Pustok.Models;
 
 namespace Pustok.Areas.Manage.Controllers;
+
 [Area("Manage")]
 public class SliderController(AppDbContext context) : Controller
 {
-    
     public IActionResult Index()
     {
-        
         return View(context.Sliders.OrderBy(s => s.Order).ToList());
     }
+
     public IActionResult Create()
     {
         return View();
     }
 
     [HttpPost]
-    public IActionResult Create(Slider slider, IFormFile? ImageFile)
+    [ValidateAntiForgeryToken]
+    public async Task<IActionResult> Create(Slider slider, IFormFile? ImageFile)
     {
         if (!ModelState.IsValid)
-            return View();
+            return View(slider);
+            
         if (context.Sliders.Any(g => g.Title == slider.Title))
         {
-            ModelState.AddModelError("Title", "This Title already exists");
-            return View();
+            ModelState.AddModelError("Title", "This title already exists");
+            return View(slider);
         }
 
-        // Handle file upload
         if (ImageFile != null && ImageFile.Length > 0)
         {
-            string uploadsFolder = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "image", "products");
-            if (!Directory.Exists(uploadsFolder))
-                Directory.CreateDirectory(uploadsFolder);
-
-            string uniqueFileName = Guid.NewGuid().ToString() + "_" + ImageFile.FileName;
-            string filePath = Path.Combine(uploadsFolder, uniqueFileName);
-
-            using (var fileStream = new FileStream(filePath, FileMode.Create))
-            {
-                ImageFile.CopyTo(fileStream);
-            }
-
-            slider.Image = uniqueFileName;
+            slider.Image = await SaveImageAsync(ImageFile);
         }
 
         context.Sliders.Add(slider);
-        context.SaveChanges();
+        await context.SaveChangesAsync();
         return RedirectToAction(nameof(Index));
     }
 
@@ -56,12 +45,12 @@ public class SliderController(AppDbContext context) : Controller
         var slider = context.Sliders.Find(id);
         if (slider == null) 
             return NotFound();
-        return PartialView("_DetailPartial", slider);
+        return View(slider);
     }
 
     public IActionResult Edit(int id)
     {
-        Slider slider = context.Sliders.Find(id);
+        var slider = context.Sliders.Find(id);
         if (slider == null)
             return NotFound();
         return View(slider);
@@ -69,15 +58,17 @@ public class SliderController(AppDbContext context) : Controller
 
     [HttpPost]
     [ValidateAntiForgeryToken]
-    public IActionResult Edit(Slider slider, IFormFile? ImageFile)
+    public async Task<IActionResult> Edit(Slider slider, IFormFile? ImageFile)
     {
         if (!ModelState.IsValid)
             return View(slider);
+            
         var existSlide = context.Sliders.FirstOrDefault(g => g.Id == slider.Id);
         if (existSlide == null) return NotFound();
+        
         if (context.Sliders.Any(g => g.Title == slider.Title && g.Id != slider.Id))
         {
-            ModelState.AddModelError("Title", "This Title already exists");
+            ModelState.AddModelError("Title", "This title already exists");
             return View(slider);
         }
 
@@ -87,26 +78,10 @@ public class SliderController(AppDbContext context) : Controller
             // Delete old image if exists
             if (!string.IsNullOrEmpty(existSlide.Image))
             {
-                string oldImagePath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "image", "products", existSlide.Image);
-                if (System.IO.File.Exists(oldImagePath))
-                {
-                    System.IO.File.Delete(oldImagePath);
-                }
+                DeleteImage(existSlide.Image);
             }
-
-            string uploadsFolder = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "image", "products");
-            if (!Directory.Exists(uploadsFolder))
-                Directory.CreateDirectory(uploadsFolder);
-
-            string uniqueFileName = Guid.NewGuid().ToString() + "_" + ImageFile.FileName;
-            string filePath = Path.Combine(uploadsFolder, uniqueFileName);
-
-            using (var fileStream = new FileStream(filePath, FileMode.Create))
-            {
-                ImageFile.CopyTo(fileStream);
-            }
-
-            existSlide.Image = uniqueFileName;
+            
+            existSlide.Image = await SaveImageAsync(ImageFile);
         }
 
         existSlide.Title = slider.Title;
@@ -114,28 +89,56 @@ public class SliderController(AppDbContext context) : Controller
         existSlide.ButtonText = slider.ButtonText;
         existSlide.ButtonUrl = slider.ButtonUrl;
         existSlide.Order = slider.Order;
-        context.SaveChanges();
+        existSlide.UpdatedAt = DateTime.Now;
+        
+        await context.SaveChangesAsync();
         return RedirectToAction(nameof(Index));
     }
-    public IActionResult Delete(int id)
+
+    public async Task<IActionResult> Delete(int id)
     {
-        Slider slider = context.Sliders.Find(id);
+        var slider = context.Sliders.Find(id);
         if (slider == null)
             return NotFound();
         
         // Delete image file if exists
         if (!string.IsNullOrEmpty(slider.Image))
         {
-            string imagePath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "image", "products", slider.Image);
-            if (System.IO.File.Exists(imagePath))
-            {
-                System.IO.File.Delete(imagePath);
-            }
+            DeleteImage(slider.Image);
         }
 
         context.Sliders.Remove(slider);
-        context.SaveChanges();
+        await context.SaveChangesAsync();
         return RedirectToAction(nameof(Index));
     }
-    
+
+    private async Task<string> SaveImageAsync(IFormFile imageFile)
+    {
+        var uploadsPath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "image", "products");
+        if (!Directory.Exists(uploadsPath))
+        {
+            Directory.CreateDirectory(uploadsPath);
+        }
+
+        var fileName = Guid.NewGuid().ToString() + Path.GetExtension(imageFile.FileName);
+        var filePath = Path.Combine(uploadsPath, fileName);
+
+        using (var fileStream = new FileStream(filePath, FileMode.Create))
+        {
+            await imageFile.CopyToAsync(fileStream);
+        }
+
+        return fileName;
+    }
+
+    private void DeleteImage(string fileName)
+    {
+        if (string.IsNullOrEmpty(fileName)) return;
+
+        var filePath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "image", "products", fileName);
+        if (System.IO.File.Exists(filePath))
+        {
+            System.IO.File.Delete(filePath);
+        }
+    }
 }

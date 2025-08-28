@@ -1,0 +1,97 @@
+@model Pustok.Models.Slider
+
+<div class="modal-header">
+    <h4 class="modal-title"><i class="fas fa-images"></i> Slider Details</h4>
+    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+</div>
+
+<div class="modal-body">
+    <div class="row">
+        <div class="col-md-6">
+            <div class="text-center mb-3">
+                @if (!string.IsNullOrEmpty(Model.Image))
+                {
+                    <img src="~/image/products/@Model.Image" alt="@Model.Title" class="img-fluid rounded shadow" style="max-height: 300px;" />
+                }
+                else
+                {
+                    <div class="bg-light rounded d-flex align-items-center justify-content-center" style="height: 300px;">
+                        <i class="fas fa-image fa-3x text-muted"></i>
+                    </div>
+                }
+            </div>
+        </div>
+
+        <div class="col-md-6">
+            <table class="table table-borderless">
+                <tr>
+                    <td><strong><i class="fas fa-hashtag"></i> Order:</strong></td>
+                    <td><span class="badge bg-primary fs-6">@Model.Order</span></td>
+                </tr>
+                <tr>
+                    <td><strong><i class="fas fa-heading"></i> Title:</strong></td>
+                    <td>@Model.Title</td>
+                </tr>
+                <tr>
+                    <td><strong><i class="fas fa-mouse-pointer"></i> Button Text:</strong></td>
+                    <td>
+                        @if (!string.IsNullOrEmpty(Model.ButtonText))
+                        {
+                            <span class="badge bg-info">@Model.ButtonText</span>
+                        }
+                        else
+                        {
+                            <span class="text-muted">No button text</span>
+                        }
+                    </td>
+                </tr>
+                <tr>
+                    <td><strong><i class="fas fa-link"></i> Button URL:</strong></td>
+                    <td>
+                        @if (!string.IsNullOrEmpty(Model.ButtonUrl))
+                        {
+                            <a href="@Model.ButtonUrl" target="_blank" class="btn btn-sm btn-outline-primary">
+                                <i class="fas fa-external-link-alt"></i> @Model.ButtonUrl
+                            </a>
+                        }
+                        else
+                        {
+                            <span class="text-muted">No URL</span>
+                        }
+                    </td>
+                </tr>
+                <tr>
+                    <td><strong><i class="fas fa-calendar"></i> Created:</strong></td>
+                    <td>@Model.CreatedAt.ToString("dd/MM/yyyy HH:mm")</td>
+                </tr>
+                @if (Model.UpdatedAt.HasValue)
+                {
+                    <tr>
+                        <td><strong><i class="fas fa-edit"></i> Updated:</strong></td>
+                        <td>@Model.UpdatedAt.Value.ToString("dd/MM/yyyy HH:mm")</td>
+                    </tr>
+                }
+            </table>
+        </div>
+    </div>
+
+    @if (!string.IsNullOrEmpty(Model.Description))
+    {
+        <hr />
+        <div class="row">
+            <div class="col-12">
+                <h6><i class="fas fa-align-left"></i> Description</h6>
+                <p class="text-muted">@Model.Description</p>
+            </div>
+        </div>
+    }
+</div>
+
+<div class="modal-footer">
+    <a asp-area="Manage" asp-controller="Slider" asp-action="Edit" asp-route-id="@Model.Id" class="btn btn-warning">
+        <i class="fas fa-edit"></i> Edit
+    </a>
+    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+        <i class="fas fa-times"></i> Close
+    </button>
+</div>

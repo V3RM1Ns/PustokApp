@@ -13,7 +13,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("Pustok")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+f70b752ddbc780c03424e4333aa6c5db1e07ba7a")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+98d35d2653cd596866b00c5c5e5b05a35f7ce8fc")]
 [assembly: System.Reflection.AssemblyProductAttribute("Pustok")]
 [assembly: System.Reflection.AssemblyTitleAttribute("Pustok")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

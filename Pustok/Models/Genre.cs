@@ -2,7 +2,7 @@ using System.ComponentModel.DataAnnotations;
 
 namespace Pustok.Models;
 
-public class Genre:BaseEntity
+public class Genre:AuditEntity
 {
     [Required(ErrorMessage = "Genre name is required.")]
     [StringLength(100, ErrorMessage = "Genre name cannot exceed 100 characters.")]

@@ -1,0 +1,141 @@
+@model Pustok.Models.Book
+
+<div class="modal-header">
+    <h4 class="modal-title"><i class="fas fa-book"></i> Book Details</h4>
+    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+</div>
+
+<div class="modal-body">
+    <div class="row">
+        <div class="col-md-4">
+            <div class="text-center mb-3">
+                @if (!string.IsNullOrEmpty(Model.MainImage))
+                {
+                    <img src="~/image/products/@Model.MainImage" alt="@Model.Title" class="img-fluid rounded shadow" style="max-height: 250px;" />
+                }
+                else
+                {
+                    <div class="bg-light rounded d-flex align-items-center justify-content-center" style="height: 250px;">
+                        <i class="fas fa-image fa-3x text-muted"></i>
+                    </div>
+                }
+            </div>
+            
+            @if (Model.BookImages?.Any() == true)
+            {
+                <div class="row">
+                    @foreach (var img in Model.BookImages.Take(4))
+                    {
+                        <div class="col-3 mb-2">
+                            <img src="~/image/products/@img.Image" alt="Additional Image" class="img-thumbnail" style="height: 50px; object-fit: cover;" />
+                        </div>
+                    }
+                </div>
+            }
+        </div>
+
+        <div class="col-md-8">
+            <table class="table table-borderless">
+                <tr>
+                    <td><strong><i class="fas fa-hashtag"></i> ID:</strong></td>
+                    <td><span class="badge bg-primary">@Model.Id</span></td>
+                </tr>
+                <tr>
+                    <td><strong><i class="fas fa-book-open"></i> Title:</strong></td>
+                    <td>@Model.Title</td>
+                </tr>
+                <tr>
+                    <td><strong><i class="fas fa-user"></i> Author:</strong></td>
+                    <td>@(Model.Author?.Name ?? "N/A")</td>
+                </tr>
+                <tr>
+                    <td><strong><i class="fas fa-tag"></i> Genre:</strong></td>
+                    <td>@(Model.Genre?.Name ?? "N/A")</td>
+                </tr>
+                <tr>
+                    <td><strong><i class="fas fa-dollar-sign"></i> Price:</strong></td>
+                    <td>
+                        <span class="text-success h5">$@Model.Price</span>
+                        @if (Model.DiscountPrice > 0)
+                        {
+                            <span class="badge bg-danger ms-2">-@Model.DiscountPrice%</span>
+                        }
+                    </td>
+                </tr>
+                <tr>
+                    <td><strong><i class="fas fa-boxes"></i> Stock:</strong></td>
+                    <td>
+                        @if (Model.InStock)
+                        {
+                            <span class="badge bg-success">In Stock</span>
+                        }
+                        else
+                        {
+                            <span class="badge bg-danger">Out of Stock</span>
+                        }
+                    </td>
+                </tr>
+                <tr>
+                    <td><strong><i class="fas fa-star"></i> Status:</strong></td>
+                    <td>
+                        @if (Model.IsFeatured)
+                        {
+                            <span class="badge bg-warning me-1">Featured</span>
+                        }
+                        @if (Model.IsNew)
+                        {
+                            <span class="badge bg-success">New</span>
+                        }
+                        @if (!Model.IsFeatured && !Model.IsNew)
+                        {
+                            <span class="text-muted">Regular</span>
+                        }
+                    </td>
+                </tr>
+                @if (Model.BookTags?.Any() == true)
+                {
+                    <tr>
+                        <td><strong><i class="fas fa-tags"></i> Tags:</strong></td>
+                        <td>
+                            @foreach (var bookTag in Model.BookTags)
+                            {
+                                <span class="badge bg-secondary me-1">@bookTag.Tag.Name</span>
+                            }
+                        </td>
+                    </tr>
+                }
+                <tr>
+                    <td><strong><i class="fas fa-calendar"></i> Created:</strong></td>
+                    <td>@Model.CreatedAt.ToString("dd/MM/yyyy HH:mm")</td>
+                </tr>
+                @if (Model.UpdatedAt.HasValue)
+                {
+                    <tr>
+                        <td><strong><i class="fas fa-edit"></i> Updated:</strong></td>
+                        <td>@Model.UpdatedAt.Value.ToString("dd/MM/yyyy HH:mm")</td>
+                    </tr>
+                }
+            </table>
+        </div>
+    </div>
+
+    @if (!string.IsNullOrEmpty(Model.Description))
+    {
+        <hr />
+        <div class="row">
+            <div class="col-12">
+                <h6><i class="fas fa-align-left"></i> Description</h6>
+                <p class="text-muted">@Model.Description</p>
+            </div>
+        </div>
+    }
+</div>
+
+<div class="modal-footer">
+    <a asp-area="Manage" asp-controller="Book" asp-action="Edit" asp-route-id="@Model.Id" class="btn btn-warning">
+        <i class="fas fa-edit"></i> Edit
+    </a>
+    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+        <i class="fas fa-times"></i> Close
+    </button>
+</div>

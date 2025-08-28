@@ -1,0 +1,182 @@
+@model List<Pustok.Models.Book>
+
+<div class="container-fluid">
+    <div class="row mb-4">
+        <div class="col">
+            <h2 class="text-primary"><i class="fas fa-book"></i> Book Management</h2>
+        </div>
+        <div class="col text-end">
+            <a asp-area="Manage" asp-controller="Book" asp-action="Create" class="btn btn-success btn-lg">
+                <i class="fas fa-plus"></i> Create New Book
+            </a>
+        </div>
+    </div>
+    
+    <div class="row">
+        <div class="col-12">
+            <div class="card shadow">
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-hover table-striped">
+                            <thead class="table-dark">
+                                <tr>
+                                    <th scope="col"><i class="fas fa-hashtag"></i> ID</th>
+                                    <th scope="col"><i class="fas fa-book-open"></i> Title</th>
+                                    <th scope="col"><i class="fas fa-align-left"></i> Description</th>
+                                    <th scope="col"><i class="fas fa-image"></i> Image</th>
+                                    <th scope="col"><i class="fas fa-user"></i> Author</th>
+                                    <th scope="col"><i class="fas fa-tag"></i> Genre</th>
+                                    <th scope="col"><i class="fas fa-dollar-sign"></i> Price</th>
+                                    <th scope="col"><i class="fas fa-cogs"></i> Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var item in Model)
+                                {
+                                    <tr>
+                                        <td><span class="badge bg-primary">@item.Id</span></td>
+                                        <td>
+                                            <strong>@item.Title</strong>
+                                            @if (item.IsNew)
+                                            {
+                                                <span class="badge bg-success ms-1">New</span>
+                                            }
+                                            @if (item.IsFeatured)
+                                            {
+                                                <span class="badge bg-warning ms-1">Featured</span>
+                                            }
+                                        </td>
+                                        <td>
+                                            @if (!string.IsNullOrEmpty(item.Description))
+                                            {
+                                                <span>@(item.Description.Length > 60 ? item.Description.Substring(0, 60) + "..." : item.Description)</span>
+                                            }
+                                            else
+                                            {
+                                                <span class="text-muted">No description</span>
+                                            }
+                                        </td>
+                                        <td>
+                                            @if (!string.IsNullOrEmpty(item.MainImage))
+                                            {
+                                                <img class="img-thumbnail" width="60" height="60" src="~/image/products/@item.MainImage" alt="@item.Title" style="object-fit: cover;" />
+                                            }
+                                            else
+                                            {
+                                                <div class="bg-light rounded d-flex align-items-center justify-content-center" style="width: 60px; height: 60px;">
+                                                    <i class="fas fa-image text-muted"></i>
+                                                </div>
+                                            }
+                                        </td>
+                                        <td>@(item.Author?.Name ?? "N/A")</td>
+                                        <td>@(item.Genre?.Name ?? "N/A")</td>
+                                        <td>
+                                            <strong class="text-success">$@item.Price</strong>
+                                            @if (item.DiscountPrice > 0)
+                                            {
+                                                <br><small class="text-danger">-@item.DiscountPrice%</small>
+                                            }
+                                        </td>
+                                        <td>
+                                            <div class="btn-group" role="group">
+                                                <button class="btn btn-sm btn-info detail-btn" data-id="@item.Id" title="View Details">
+                                                    <i class="fas fa-eye"></i>
+                                                </button>
+                                                <a asp-area="Manage" asp-controller="Book" asp-action="Edit" asp-route-id="@item.Id" 
+                                                   class="btn btn-sm btn-warning" title="Edit">
+                                                    <i class="fas fa-edit"></i>
+                                                </a>
+                                                <a asp-area="Manage" asp-controller="Book" asp-action="Delete" asp-route-id="@item.Id" 
+                                                   class="btn btn-sm btn-danger delete" title="Delete">
+                                                    <i class="fas fa-trash"></i>
+                                                </a>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Detail Modal -->
+<div class="modal fade" id="detailModal" tabindex="-1" role="dialog" aria-labelledby="detailModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-xl" role="document">
+        <div class="modal-content">
+            <!-- Modal content will be loaded here -->
+        </div>
+    </div>
+</div>
+
+@section Scripts
+{
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script>
+        $(document).ready(function(){
+            // Delete functionality
+            $(".delete").click(function(e){
+                e.preventDefault();
+                let url = $(this).attr("href");
+                Swal.fire({
+                    title: "Are you sure?",
+                    text: "You won't be able to revert this!",
+                    icon: "warning",
+                    showCancelButton: true,
+                    confirmButtonColor: "#d33",
+                    cancelButtonColor: "#3085d6",
+                    confirmButtonText: "Yes, delete it!"
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        fetch(url, {
+                            method: 'POST',
+                            headers: {
+                                'X-Requested-With': 'XMLHttpRequest'
+                            }
+                        }).then(res=>{
+                            if(res.ok) {
+                                Swal.fire({
+                                    title: "Deleted!",
+                                    text: "Book has been deleted.",
+                                    icon: "success"
+                                });
+                                window.location.reload();
+                            }
+                            else{
+                                Swal.fire({
+                                    title: "Error!",
+                                    text: "Something went wrong.",
+                                    icon: "error"
+                                });
+                            }
+                        });
+                    } 
+                }); 
+            });
+
+            // Detail Modal functionality
+            $(".detail-btn").click(function() {
+                let id = $(this).data('id');
+                let url = `/manage/book/detail/${id}`;
+                
+                fetch(url)
+                    .then(response => response.text())
+                    .then(html => {
+                        $("#detailModal .modal-content").html(html);
+                        $("#detailModal").modal('show');
+                    })
+                    .catch(error => {
+                        console.error('Error:', error);
+                        Swal.fire({
+                            title: "Error!",
+                            text: "Failed to load book details.",
+                            icon: "error"
+                        });
+                    });
+            });
+        });
+    </script>
+}

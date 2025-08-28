@@ -1,0 +1,157 @@
+@model List<Pustok.Models.Author>
+
+<div class="container-fluid">
+    <div class="row mb-4">
+        <div class="col">
+            <h2 class="text-primary"><i class="fas fa-user"></i> Author Management</h2>
+        </div>
+        <div class="col text-end">
+            <a asp-area="Manage" asp-controller="Author" asp-action="Create" class="btn btn-success btn-lg">
+                <i class="fas fa-plus"></i> Create New Author
+            </a>
+        </div>
+    </div>
+    
+    @if (TempData["Error"] != null)
+    {
+        <div class="alert alert-danger alert-dismissible fade show" role="alert">
+            <i class="fas fa-exclamation-triangle"></i> @TempData["Error"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+    }
+    
+    <div class="row">
+        <div class="col-12">
+            <div class="card shadow">
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-hover table-striped">
+                            <thead class="table-dark">
+                                <tr>
+                                    <th scope="col"><i class="fas fa-hashtag"></i> ID</th>
+                                    <th scope="col"><i class="fas fa-user"></i> Name</th>
+                                    <th scope="col"><i class="fas fa-book"></i> Books Count</th>
+                                    <th scope="col"><i class="fas fa-calendar"></i> Created Date</th>
+                                    <th scope="col"><i class="fas fa-cogs"></i> Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var item in Model)
+                                {
+                                    <tr>
+                                        <td><span class="badge bg-primary">@item.Id</span></td>
+                                        <td><strong>@item.Name</strong></td>
+                                        <td>
+                                            @if (item.Books?.Any() == true)
+                                            {
+                                                <span class="badge bg-info">@item.Books.Count books</span>
+                                            }
+                                            else
+                                            {
+                                                <span class="text-muted">No books</span>
+                                            }
+                                        </td>
+                                        <td>@item.CreatedAt.ToString("dd/MM/yyyy")</td>
+                                        <td>
+                                            <div class="btn-group" role="group">
+                                                <button class="btn btn-sm btn-info detail-btn" data-id="@item.Id" title="View Details">
+                                                    <i class="fas fa-eye"></i>
+                                                </button>
+                                                <a asp-area="Manage" asp-controller="Author" asp-action="Edit" asp-route-id="@item.Id" 
+                                                   class="btn btn-sm btn-warning" title="Edit">
+                                                    <i class="fas fa-edit"></i>
+                                                </a>
+                                                <a asp-area="Manage" asp-controller="Author" asp-action="Delete" asp-route-id="@item.Id" 
+                                                   class="btn btn-sm btn-danger delete" title="Delete">
+                                                    <i class="fas fa-trash"></i>
+                                                </a>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Detail Modal -->
+<div class="modal fade" id="detailModal" tabindex="-1" role="dialog" aria-labelledby="detailModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg" role="document">
+        <div class="modal-content">
+            <!-- Modal content will be loaded here -->
+        </div>
+    </div>
+</div>
+
+@section Scripts
+{
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script>
+        $(document).ready(function(){
+            // Delete functionality
+            $(".delete").click(function(e){
+                e.preventDefault();
+                let url = $(this).attr("href");
+                Swal.fire({
+                    title: "Are you sure?",
+                    text: "You won't be able to revert this!",
+                    icon: "warning",
+                    showCancelButton: true,
+                    confirmButtonColor: "#d33",
+                    cancelButtonColor: "#3085d6",
+                    confirmButtonText: "Yes, delete it!"
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        fetch(url, {
+                            method: 'POST',
+                            headers: {
+                                'X-Requested-With': 'XMLHttpRequest'
+                            }
+                        }).then(res=>{
+                            if(res.ok) {
+                                Swal.fire({
+                                    title: "Deleted!",
+                                    text: "Author has been deleted.",
+                                    icon: "success"
+                                });
+                                window.location.reload();
+                            }
+                            else{
+                                Swal.fire({
+                                    title: "Error!",
+                                    text: "Something went wrong.",
+                                    icon: "error"
+                                });
+                            }
+                        });
+                    } 
+                }); 
+            });
+
+            // Detail Modal functionality
+            $(".detail-btn").click(function() {
+                let id = $(this).data('id');
+                let url = `/manage/author/detail/${id}`;
+                
+                fetch(url)
+                    .then(response => response.text())
+                    .then(html => {
+                        $("#detailModal .modal-content").html(html);
+                        $("#detailModal").modal('show');
+                    })
+                    .catch(error => {
+                        console.error('Error:', error);
+                        Swal.fire({
+                            title: "Error!",
+                            text: "Failed to load author details.",
+                            icon: "error"
+                        });
+                    });
+            });
+        });
+    </script>
+}
