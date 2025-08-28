@@ -1,0 +1,66 @@
+@model Pustok.Models.Slider
+
+<div class="modal-header">
+    <h4 class="modal-title">Slider Details</h4>
+    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+</div>
+<div class="modal-body">
+    <div class="row">
+        <div class="col-md-6">
+            <div class="mb-3">
+                <strong>ID:</strong> @Model.Id
+            </div>
+            <div class="mb-3">
+                <strong>Title:</strong> @Model.Title
+            </div>
+            <div class="mb-3">
+                <strong>Description:</strong> @Model.Description
+            </div>
+            <div class="mb-3">
+                <strong>Button Text:</strong> @Model.ButtonText
+            </div>
+            <div class="mb-3">
+                <strong>Button URL:</strong> 
+                @if (!string.IsNullOrEmpty(Model.ButtonUrl))
+                {
+                    <a href="@Model.ButtonUrl" target="_blank">@Model.ButtonUrl</a>
+                }
+                else
+                {
+                    <span class="text-muted">No URL</span>
+                }
+            </div>
+            <div class="mb-3">
+                <strong>Order:</strong> @Model.Order
+            </div>
+            <div class="mb-3">
+                <strong>Created:</strong> @Model.CreatedAt.ToString("dd/MM/yyyy HH:mm")
+            </div>
+            <div class="mb-3">
+                <strong>Updated:</strong> @Model.UpdatedAt?.ToString("dd/MM/yyyy HH:mm")
+            </div>
+        </div>
+        <div class="col-md-6">
+            @if (!string.IsNullOrEmpty(Model.Image))
+            {
+                <div class="mb-3">
+                    <strong>Image:</strong>
+                    <div class="mt-2">
+                        <img src="~/image/products/@Model.Image" alt="@Model.Title" class="img-fluid" style="max-width: 100%; height: auto; border: 1px solid #ddd; border-radius: 4px;" />
+                    </div>
+                </div>
+            }
+            else
+            {
+                <div class="mb-3">
+                    <strong>Image:</strong>
+                    <div class="text-muted">No image uploaded</div>
+                </div>
+            }
+        </div>
+    </div>
+</div>
+<div class="modal-footer">
+    <a asp-area="Manage" asp-controller="Slider" asp-action="Edit" asp-route-id="@Model.Id" class="btn btn-warning">Edit</a>
+    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+</div>
